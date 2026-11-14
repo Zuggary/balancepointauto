@@ -46,6 +46,18 @@ a:hover { text-decoration-thickness: 2px; }
 .brand b { font-family: var(--display); font-weight: 400; font-size: 23px; letter-spacing: 0; }
 .navlink { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; font-size: 16px; font-weight: 500; }
 @media (min-width: 900px) { .top { height: 80px; } }
+.main-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; border-bottom: 1px solid var(--hair); }
+.main-nav a { display: inline-flex; align-items: center; min-height: 44px; font-size: 12.5px; color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; white-space: nowrap; }
+.main-nav a:hover { text-decoration-thickness: 2px; }
+.main-nav a[aria-current="page"] { font-weight: 600; text-decoration-thickness: 2px; }
+.main-nav .g-nt { margin-left: 2px; }
+.main-nav .g-nt svg { width: 10px; height: 10px; }
+@media (min-width: 600px) {
+  .main-nav { gap: 0 22px; }
+  .main-nav a { font-size: 15px; }
+  .main-nav .g-nt { margin-left: 5px; }
+  .main-nav .g-nt svg { width: 11px; height: 11px; }
+}
 
 /* buttons */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 52px; padding: 0 28px; border-radius: 999px;
@@ -709,3 +721,9 @@ a[data-newtab] > .sr { font-size: 0; line-height: 0; }
 .g-assump-l { display: block; }
 .g-assump-l + .g-assump-l { margin-top: 4px; }
 .g-ask-sep { display: none; }
+
+/* static homepage guide overview: shown only on the front door */
+.about-guide { margin-top: 40px; padding-top: 32px; border-top: 1px solid var(--hair); }
+.about-guide .prose { padding-top: 0; }
+.about-guide h2:first-child { margin-top: 0; }
+#guide[data-view] ~ #about-guide, #app:not([hidden]) ~ #about-guide { display: none; }

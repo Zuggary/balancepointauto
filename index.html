@@ -453,6 +453,7 @@ input[type=range]:focus-visible { outline: 3px solid var(--ink); outline-offset:
   </a>
   <a class="navlink" href="how-it-works.html">How it works</a>
 </header>
+<nav class="main-nav wrap" aria-label="Main"><a href="index.html" aria-current="page">Guide</a><a href="finance-office.html">Finance office</a><a href="how-it-works.html">How it works</a><a href="about.html">About</a><a href="privacy.html">Privacy</a></nav>
 
 <main id="main">
   <section class="intro" id="intro" aria-labelledby="h1">
@@ -646,6 +647,29 @@ input[type=range]:focus-visible { outline: 3px solid var(--ink); outline-offset:
     </div>
   </div>
   <div class="gwrap wrap" id="guide" hidden></div>
+  <section class="wrap about-guide" id="about-guide" aria-labelledby="ag-what">
+    <div class="prose">
+      <h2 id="ag-what">What Balance Point does</h2>
+      <p>Balance Point is a free guide for the day you buy a car. You type a few monthly numbers. It shows what the car costs you each month, all in, next to the most you want all car costs to take. It does not tell you what to buy, what to offer or whom to borrow from.</p>
+      <h2>How a deal goes, and where the guide helps</h2>
+      <ul>
+        <li><b>Getting ready:</b> set the monthly limit for all car costs.</li>
+        <li><b>Looking at a car:</b> check one price against your limit.</li>
+        <li><b>Looking at the numbers:</b> type the payment, the months and what you know from the sheet, and compare offers.</li>
+        <li><b>Your trade-in:</b> see what money still owed on a trade does to the new loan.</li>
+        <li><b>The finance office:</b> see what each add-on adds to your month, and the cancel facts for your state.</li>
+        <li><b>Already bought:</b> read the cancel facts for the add-ons you bought.</li>
+      </ul>
+      <h2>A worked example</h2>
+      <p>Say your limit is $900 a month for the whole car. A sheet shows a payment of $548 for 60 months. Insurance, fuel, upkeep and registration are not in that payment. With example costs of about $390 a month, the car costs about $938 a month. That is $38 over the limit. A second sheet shows $461.26 for 75 months. Each month costs $87 less, but the 15 extra months add about $1,715 to the total of payments. The guide shows both facts side by side and leaves the choice to you. These numbers are examples.</p>
+      <h2>Where the numbers come from</h2>
+      <p>Four starting numbers come from public sources: the US average gas price and the average electricity price (Energy Information Administration), average yearly miles per driver (Federal Highway Administration) and the average new-car loan rate (Federal Reserve). The other example figures (insurance, upkeep, registration, a used-car rate and sales tax) are round numbers with no source. They are marked as examples until you type your own. The <a href="how-it-works.html">How it works</a> page lists each source and date.</p>
+      <h2>The finance office</h2>
+      <p>The <a href="finance-office.html">finance-office pages</a> give plain facts about add-on products in Oregon, Washington and California: vehicle service contracts, GAP waivers, and credit life and disability insurance. Each fact shows the words of its source and a link to it. Laws change, so each page says when its facts were last checked.</p>
+      <h2>What Balance Point is not</h2>
+      <p>It is not a lender and it names none. It does not ask for your name, email or card number. The numbers you type stay in your <a href="privacy.html">browser</a>. It is general information, not financial, legal or credit advice.</p>
+    </div>
+  </section>
   <p class="sr" id="live" aria-live="polite"></p>
 </main>
 
@@ -4063,14 +4087,14 @@ if (/[?&]test=1/.test(location.search)) window.__bp = { fillLimits: fillLimits, 
     if (/^n=/.test(h)) return;
     var priced = (!B.priceSubmitted || B.priceSubmitted()) && B.v("fast.price") !== null && !S.example && !S.exv["fast.price"];
     if (h === "before" || h === "desk" || h === "trade" || h === "office" || h === "after") { show(h); return; }
-    root.hidden = true; root.classList.remove("has-qcmp"); G.view = ""; document.title = "Balance Point Auto";
+    root.hidden = true; root.removeAttribute("data-view"); root.classList.remove("has-qcmp"); G.view = ""; document.title = "Balance Point Auto";
     var map = { "before/month": 1, "before/paths": 6, "before/room": 8, "lot": priced ? 6 : 5, "lot/detail": 9, "": 0 };
     var st = map[h] === undefined ? 0 : map[h];
     if (st === 6 && !priced) st = 5;
     B.go(st, true); doorRow();
     window.scrollTo(0, 0); var hh = st ? document.getElementById("t" + st) : null; if (hh) hh.focus({ preventScroll: true });
   }
-  B.onGo = function (i) { if (i !== undefined) { root.hidden = true; root.classList.remove("has-qcmp"); G.view = ""; } };
+  B.onGo = function (i) { if (i !== undefined) { root.hidden = true; root.removeAttribute("data-view"); root.classList.remove("has-qcmp"); G.view = ""; } };
   B.after = function () {
     if (G.view === "before") drawBefore(); else if (G.view === "desk") drawDesk(); else if (G.view === "trade") drawTrade(); else if (G.view === "office") drawOffice(); else if (G.view === "after") drawAfter();
     doorRow();
