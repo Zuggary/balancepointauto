@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Privacy · Balance Point Auto</title>
-<meta name="description" content="Your numbers never leave your browser. What we store, what we do not, and our plans for ads.">
+<meta name="description" content="The numbers you type are never put into a request. What the visit counter receives, what we store, and our plans for ads.">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F3F6FA">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; base-uri 'none'; form-action 'none'">
@@ -25,7 +25,7 @@
 <div class="wrap doc notoc"><main id="main" class="prose dmain pmain">
 <div class="phead"><div class="phtext">
 <h1>Nothing you type leaves this browser.</h1>
-<p class="lead">That is the privacy promise. The calculator runs on your device and sends your numbers to no server, ours included.</p>
+<p class="lead">That is the privacy promise. The calculator runs on your device and never puts the numbers you type into any request: not to us, not to the visit counter. The site does count visits, and the counter&rsquo;s company receives some details, as described below.</p>
 <p class="note">A calculator for learning. Not financial, legal or credit advice. We recommend no lender.</p></div>
 <figure class="pfig phfig"><svg viewBox="0 0 380 330" role="img" aria-label="A browser window with the scale inside it. An arrow to a server is crossed out: nothing you type is sent."><defs><linearGradient id="bmx" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5A6684"/><stop offset=".2" stop-color="#2B3552"/><stop offset="1" stop-color="#05080F"/></linearGradient>
 <linearGradient id="frx" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".18"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".1"/></linearGradient></defs>
@@ -42,19 +42,33 @@
 <path d="M322,140 l20,20 M342,140 l-20,20" stroke="#B33218" stroke-width="3.5" stroke-linecap="round"/>
 <rect x="306" y="200" width="58" height="22" rx="4" fill="#E2E7EF" stroke="#9AA3B5"/><rect x="306" y="226" width="58" height="22" rx="4" fill="#E2E7EF" stroke="#9AA3B5"/><circle cx="352" cy="211" r="2.5" fill="#9AA3B5"/><circle cx="352" cy="237" r="2.5" fill="#9AA3B5"/>
 <text x="335" y="268" font-size="13" fill="#4A5468" text-anchor="middle">any server</text>
-<text x="4" y="300" font-size="15" fill="#11182A" font-weight="600">Nothing you type is sent.</text><text x="4" y="322" font-size="14" fill="#4A5468">No sign-up, no tracking.</text>
+<text x="4" y="300" font-size="15" fill="#11182A" font-weight="600">Nothing you type is sent.</text><text x="4" y="322" font-size="14" fill="#4A5468">No sign-up, no cookie.</text>
 </svg></figure></div>
-<section class="part" aria-labelledby="h-c"><h2 id="h-c">What we collect</h2><p class="ans">Nothing.</p><div class="pbody"><p>We ask for no name, email, phone, address, account or card number. There is no sign-up and no lead form. The site stores nothing unless you tick Remember, and loads nothing from other sites.</p></div></section>
-<section class="part" aria-labelledby="h-d"><h2 id="h-d">What stays on your device</h2><p class="ans">Only what you choose to keep, and only in this browser.</p><div class="pbody"><ul>
-<li><b>Remember my numbers on this device</b> is off unless you tick it. When on, your numbers are saved in this browser&rsquo;s local storage, only on this device. Untick it to erase them.</li>
-<li><b>Copy a link with these numbers</b> puts your numbers in the part of the link after the # sign. Browsers do not send that part to any server. Anyone you give the link to can see the numbers in it.</li></ul></div></section>
-<section class="part" aria-labelledby="h-h"><h2 id="h-h">Our web host</h2><p class="ans">The company that serves these pages may log basic request data, never your numbers.</p><div class="pbody"><p>Like any website, the host may log an IP address and the time of a visit. Those logs never contain the numbers you type, because the numbers never leave your browser.</p></div></section>
+<section class="part" aria-labelledby="h-c"><h2 id="h-c">What we collect</h2><p class="ans">We ask for no name, email or account. Cloudflare&rsquo;s servers receive your IP address and browser details, as any website&rsquo;s host does.</p><div class="pbody"><p>There is no sign-up and no lead form. The site stores nothing in your browser unless you switch on Keep my numbers. It loads one file from another company, the visit counter described next.</p></div></section>
+<section class="part" aria-labelledby="h-v"><h2 id="h-v">Counting visits</h2><p class="ans">The calculator page loads a counter from Cloudflare. It reports visits, screens and the steps below. Our page never puts your numbers into a request.</p><div class="pbody">
+<p>On balancepointauto.com the calculator page loads one small script from Cloudflare Web Analytics. It runs on that page only. This page, How it works and the finance office pages load no script and are not counted. The counter reports a page view when the page loads. In browsers that support the Navigation API (such as Chrome and Edge) it also reports a page view each time you open another screen or go Back or Forward; other browsers report fewer. It also reports these steps:</p>
+<ul>
+<li>the visit began</li>
+<li>opened one of the screens: Getting ready, Looking at a car, Looking at the numbers, Your trade-in, Signing the paperwork (the finance office), or Already bought</li>
+<li>filled in a first offer that has a payment and a number of months; filled in a second one</li>
+<li>used the example running costs; chose to type your own running costs; chose to enter only the payment you want</li>
+<li>filled in a trade-in; ticked an add-on; opened the cancel facts; printed the sheet; switched on Keep my numbers</li>
+</ul>
+<p>Each step is sent as a fixed word from a short list in the page&rsquo;s code, such as &ldquo;open-desk&rdquo; or &ldquo;addon-ticked&rdquo;. The words say which screen was opened or which kind of action happened. A step never carries a number, a price, a state, a product name, whether you are over or under your limit, or which offer was better.</p>
+<p>Cloudflare receives each page view and step as its own web request from your browser. So it receives what any web host receives: your IP address, your browser type and version, your operating system, the time, and the page address (with the fixed word for a step). The counter also sends page-load timings: how fast the page loaded and how much memory it used. It sends no names of page parts: the page switches that part of Cloudflare&rsquo;s reporting off before the counter loads. From your IP address Cloudflare can tell roughly where you are. It receives the name of the site you came from, never the page.</p>
+<p>The address it receives never has your numbers in it. Before the counter loads, this page cuts anything after a ? or # from the address bar, except a bare screen name such as #desk, and it does not put numbers back. If you open or paste a link with numbers later, this page reads them first, removes them from the address bar and hides that address from the counter&rsquo;s code. That is what our page does. We cannot promise what Cloudflare&rsquo;s own code or servers do.</p>
+<p>The script sets no cookie. Cloudflare says its Web Analytics does not use cookies or local storage, and does not fingerprint people; read <a href="https://www.cloudflare.com/web-analytics/">what Cloudflare says</a>. Those statements are Cloudflare&rsquo;s, not ours, and we cannot check them for you. We load the counter only if it matches the fingerprint of the version we reviewed; if Cloudflare changes the file, the counter does not run until we review the new one.</p>
+<p>To avoid the counter, use a content blocker, or any browser setting that blocks scripts from other sites. The calculator works the same without it. The counter does not run when the page is opened from a file or from any address other than balancepointauto.com.</p></div></section>
+<section class="part" aria-labelledby="h-d"><h2 id="h-d">What stays on your device</h2><p class="ans">The numbers you type stay in this page. Only what you choose to keep stays longer, in this browser only.</p><div class="pbody"><ul>
+<li><b>Keep my numbers on this device</b> is off unless you switch it on. When on, your numbers are saved in this browser&rsquo;s local storage, only on this device. Switch it off to erase them. Turning it on is itself counted as one of the steps above, without the numbers. Without it, your numbers are gone when you reload the page.</li>
+<li><b>Copy a link with these numbers</b> puts your numbers in the part of the link after the # sign, and copies that link to your clipboard. Anyone you give the link to can see the numbers in it. On this site the link is not put in your address bar. When you open such a link, the page reads the numbers into memory and removes them from the address bar. They are in this page only: if you reload, they are gone, unless you switch on Keep my numbers.</li></ul></div></section>
+<section class="part" aria-labelledby="h-h"><h2 id="h-h">Our web host</h2><p class="ans">The company that serves these pages may log basic request data, never your numbers.</p><div class="pbody"><p>Like any website, the host may log an IP address and the time of a visit. Those logs never contain the numbers you type, because the numbers are never sent.</p></div></section>
 <section class="part" aria-labelledby="h-a"><h2 id="h-a">Ads</h2><p class="ans">No ads today. We plan to show Google ads later; this page will say so before any ad appears. The site&rsquo;s ads.txt file names the ad account for that.</p></section>
 <section class="part who" aria-labelledby="h-w"><h2 id="h-w">Who runs this</h2><p class="ans">One person, independently. No lender or dealer pays for it, and none of them sees your numbers.</p><div class="pbody"><p>Questions: <a href="mailto:hello@balancepointauto.com">hello@balancepointauto.com</a>.</p><p class="hint">Last updated 13 November 2026.</p></div></section>
 </main></div>
 <footer class="foot wrap">
   <p><b>Independent.</b> Not paid by lenders or dealers. A calculator for learning, not financial, legal or credit advice.</p>
-  <nav aria-label="Footer"><a href="index.html">The calculator</a><a href="how-it-works.html">How it works</a><a href="privacy.html">Privacy</a><a href="mailto:hello@balancepointauto.com">hello@balancepointauto.com</a></nav>
+  <nav aria-label="Footer"><a href="index.html">The calculator</a><a href="how-it-works.html">How it works</a><a href="finance-office.html">Finance office</a><a href="privacy.html">Privacy</a><a href="mailto:hello@balancepointauto.com">hello@balancepointauto.com</a></nav>
 </footer>
 </body>
 </html>
