@@ -727,3 +727,5 @@ a[data-newtab] > .sr { font-size: 0; line-height: 0; }
 .about-guide .prose { padding-top: 0; }
 .about-guide h2:first-child { margin-top: 0; }
 #guide[data-view] ~ #about-guide, #app:not([hidden]) ~ #about-guide { display: none; }
+
+main[tabindex="-1"]:focus{outline:none}

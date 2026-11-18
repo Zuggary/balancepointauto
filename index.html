@@ -456,7 +456,7 @@ input[type=range]:focus-visible { outline: 3px solid var(--ink); outline-offset:
 </header>
 <nav class="main-nav wrap" aria-label="Main"><a href="index.html" aria-current="page">Guide</a><a href="finance-office.html">Finance office</a><a href="how-it-works.html">How it works</a><a href="about.html">About</a><a href="privacy.html">Privacy</a></nav>
 
-<main id="main">
+<main id="main" tabindex="-1">
   <section class="intro" id="intro" aria-labelledby="h1">
     <h1 class="sr" id="h1">Where are you in the deal?</h1>
     <div class="stage" id="heroStage">
@@ -1676,11 +1676,13 @@ function fieldDom(id, pre) {
   var hint = (f.hint || "") + (f.src ? ' <span class="src">Filled in from ' + esc(SRC[f.src].t) + ' <button type="button" class="linkbtn" data-reset="' + id + '">Use this number</button></span>' : "");
   var dKey = window.BPGuide && BPGuide.defKeyFor ? BPGuide.defKeyFor(f.label) : "";
   var dH = dKey && window.BPGuide && BPGuide.defHtml ? BPGuide.defHtml(dKey) : "";
+  var unit = k.pre === "$" ? "US dollars" : k.post === "%" ? "percent" : k.post || "";
   var lblH = '<label for="' + fid + '">' + esc(f.label) + "</label>";
   w.innerHTML = (dH ? '<div class="g-lblrow">' + lblH + dH + "</div>" : lblH) + '<div class="inrow">' + (k.pre ? '<span class="unit" aria-hidden="true">' + k.pre + "</span>" : "") +
-    '<input id="' + fid + '" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby="e-' + sid + (hint ? " h-" + sid : "") + '"' + (f.ph ? ' placeholder="' + esc(f.ph) + '"' : "") + ">" +
+    '<input id="' + fid + '" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby="e-' + sid + ' w-' + sid + (unit ? " u-" + sid : "") + (hint ? " h-" + sid : "") + '"' + (f.ph ? ' placeholder="' + esc(f.ph) + '"' : "") + ">" +
     (k.post ? '<span class="unit" aria-hidden="true">' + k.post + "</span>" : "") + "</div>" +
     (f.slider ? '<input type="range" tabindex="0" aria-label="' + esc(f.label) + ', slider" min="' + f.slider[0] + '" max="' + f.slider[1] + '" step="' + f.slider[2] + '" value="' + f.slider[0] + '" data-for="' + id + '">' : "") +
+    (unit ? '<span class="sr" id="u-' + sid + '">' + esc(unit) + "</span>" : "") +
     '<p class="err" id="e-' + sid + '"></p><p class="warn" id="w-' + sid + '"></p><p class="hint exhint" id="x-' + sid + '" hidden><span class="mark">example</span> A stand-in, not an average. Type yours.</p>' + (hint ? '<p class="hint" id="h-' + sid + '">' + hint + "</p>" : "");
   var inp = w.querySelector("input[type=text]");
   var exv0 = !!S.ex[id] && !S.example && !f.src && !!S.v[id];
@@ -1695,7 +1697,7 @@ function fieldDom(id, pre) {
     mirror(); changed(id); });
   inp.addEventListener("blur", function () { if (!inp.value.trim() && (EX[id] && S.ex[id] && S.example || f.src)) { inp.value = S.v[id]; render(); } if (f.kind === "pct" && window.BPGuide) { var cp = window.BPGuide.cleanDecimals(inp.value, 3); if (cp !== inp.value) { inp.value = cp; S.v[id] = cp; } } var p = parse(id); if (p.v !== null && p.v !== undefined && (k.pre === "$" && f.kind === "money" || f.kind === "miles")) { inp.value = f.kind === "money" && window.BPGuide ? window.BPGuide.cleanDecimals(NF.format(p.v), 2) : NF.format(p.v); S.v[id] = inp.value; } });
   var rg = w.querySelector("input[type=range]");
-  if (rg) rg.addEventListener("input", function () { inp.value = NF.format(Number(rg.value)); S.v[id] = inp.value; S.typed = true; if (S.ex) delete S.ex[id]; if (S.exv) delete S.exv[id]; mirror(); fillRange(rg); changed(id, true); });
+  if (rg) rg.addEventListener("input", function () { inp.value = NF.format(Number(rg.value)); S.v[id] = inp.value; S.typed = true; if (id === "fast.price" || id === S.nu + ".price") S.priceSubmitted = false; if (S.ex) delete S.ex[id]; if (S.exv) delete S.exv[id]; mirror(); fillRange(rg); changed(id, true); });
   return w;
 }
 function groupLive(inp) { // 24000 -> 24,000 while typing; the caret stays after the same digit
@@ -2616,6 +2618,12 @@ function renderMain() {
     w.classList.toggle("bad", !!p.err); if (i) i.setAttribute("aria-invalid", p.err ? "true" : "false"); if (e) e.textContent = p.err || "";
     var exm = !!(S.ex[id] || (S.example && S.exv[id])) && !!(S.v[id] || "").trim();
     var xh = w.querySelector(".exhint"); if (xh) { xh.hidden = !exm; xh.innerHTML = S.example && S.exv[id] ? '<span class="mark">example</span> A made-up number for the example. Type yours.' : '<span class="mark">example</span> A stand-in, not an average. Type yours, or 0 if you pay none.'; }
+    if (i && xh) {
+      var refs = (i.getAttribute("aria-describedby") || "").split(" ").filter(function (ref) { return ref !== xh.id; });
+      if (exm) refs.push(xh.id);
+      var description = refs.join(" ");
+      if (i.getAttribute("aria-describedby") !== description) i.setAttribute("aria-describedby", description);
+    }
     w.classList.toggle("isex", exm);
     if (i && !S.example && !(F[id] && F[id].src)) { var exOn = !!S.ex[id] && !!(S.v[id] || "").trim(); if (exOn) { if (i.value === S.v[id]) i.value = ""; i.placeholder = "example: " + S.v[id]; } else i.placeholder = (F[id] && F[id].ph) || ""; }
     var wn = w.querySelector(".warn"); if (wn) wn.textContent = p.err || p.v === null || p.v === undefined ? "" :
@@ -2910,12 +2918,12 @@ function openBedit(focusId) {
     be.hidden = false; render();
   }
   var tgt = focusId ? document.getElementById(fieldId(focusId, "e")) : be.querySelector("input[type=text]");
-  if (tgt) { if (tgt.scrollIntoView) tgt.scrollIntoView({ behavior: "smooth", block: "center" }); tgt.focus(); }
+  if (tgt) { if (tgt.scrollIntoView) tgt.scrollIntoView({ behavior: RM.matches ? "auto" : "smooth", block: "center" }); tgt.focus(); }
 }
 function focusLotEdit(id) {
   EDIT[id] = true; render();
   var tgt = document.getElementById(fieldId(id, "e"));
-  if (tgt) { if (tgt.scrollIntoView) tgt.scrollIntoView({ behavior: "smooth", block: "center" }); tgt.focus(); }
+  if (tgt) { if (tgt.scrollIntoView) tgt.scrollIntoView({ behavior: RM.matches ? "auto" : "smooth", block: "center" }); tgt.focus(); }
 }
 document.addEventListener("click", function (e) {
   var mv = e.target.closest && e.target.closest("#lotMoves [data-move]");
@@ -3202,11 +3210,13 @@ function clearAll() { S.v = {}; S.pl = false; fillDefaults(); S.exv = {}; S.type
 $("#clear").addEventListener("click", function () { clearAll(); go(1); });
 function snapshot() { return { ex: S.ex, nu: S.nu, v: S.v, debts: S.debts, path: S.path, fuel: S.fuel, taxCredit: S.taxCredit, roll: S.roll, leaseRateMode: S.leaseRateMode, acqCap: S.acqCap, taxOn: S.taxOn, rb: S.rb, pl: !!S.pl, ra: !!S.runAccepted }; }
 function restore(o) {
-  if (!o || typeof o !== "object" || typeof o.v !== "object") return false;
+  if (!o || typeof o !== "object" || !o.v || typeof o.v !== "object" || Array.isArray(o.v)) return false;
+  var debts = Array.isArray(o.debts) ? o.debts.slice(0, 12) : [];
+  if (debts.some(function (d) { return !d || typeof d !== "object"; })) return false;
   S.v = {}; for (var k in o.v) if (typeof o.v[k] === "string" && o.v[k].length < 40) S.v[k] = o.v[k];
-  S.debts = Array.isArray(o.debts) ? o.debts.slice(0, 12).map(function (d) { return { kind: KINDN[d.kind] ? d.kind : "card", bal: String(d.bal || "").slice(0, 20), rate: String(d.rate || "").slice(0, 20), pay: String(d.pay || "").slice(0, 20) }; }) : [];
+  S.debts = debts.map(function (d) { return { kind: KINDN[d.kind] ? d.kind : "card", bal: String(d.bal || "").slice(0, 20), rate: String(d.rate || "").slice(0, 20), pay: String(d.pay || "").slice(0, 20) }; });
   ["path", "leaseRateMode", "taxOn"].forEach(function (k) { if (typeof o[k] === "string") S[k] = o[k]; });
-  if (!PATHIDS[S.path]) S.path = "used";
+  if (!Object.prototype.hasOwnProperty.call(PATHIDS, S.path)) S.path = "used";
   ["fuel", "taxCredit", "roll"].forEach(function (k) { if (o[k] && typeof o[k] === "object") for (var j in S[k]) if (o[k][j] !== undefined) S[k][j] = o[k][j]; });
   if (typeof o.acqCap === "boolean") S.acqCap = o.acqCap;
   S.pl = o.pl === true; S.runAccepted = o.ra === true;
@@ -3317,7 +3327,7 @@ function loadHash(h) {   // a shared link opened after start-up (counter guard):
   if (!ok) return false;
   S.fromLink = true; debtDom(); syncInputs(); setPath(S.path); S.typed = true; go(6, true); return true;
 }
-window.BPB = { loadHash: loadHash, S: S, F: F, def: def, fieldId: fieldId, fieldDom: fieldDom, el: el, esc: esc, $: $, v: v, bad: bad, parseAll: parseAll, go: go, render: render, setPath: setPath, syncInputs: syncInputs,
+window.BPB = { reducedMotion: RM, loadHash: loadHash, S: S, F: F, def: def, fieldId: fieldId, fieldDom: fieldDom, el: el, esc: esc, $: $, v: v, bad: bad, parseAll: parseAll, go: go, render: render, setPath: setPath, syncInputs: syncInputs,
     fuelFor: fuelFor, miniSvg: miniSvg, deskScale: deskScale, officeScale: officeScale, runAccepted: function (x) { if (x !== undefined) S.runAccepted = !!x; return S.runAccepted; }, priceSubmitted: function (x) { if (x !== undefined) S.priceSubmitted = !!x; return !!S.priceSubmitted; }, kindOf: kindOf, SRC: SRC, SRCT: SRCT, remember: remember, save: save, loadExample: loadExample, clearAll: clearAll, NF: NF, EX: EX, tw: tw, DISP: DISP, snapshot: snapshot };
 if (/[?&]test=1/.test(location.search)) window.__bp = { fillLimits: fillLimits, answerable: function (p) { return answerable(p, M.raw[p]); }, S: S, M: function () { return M; }, go: go, setPath: setPath, loadExample: loadExample, render: render, F: F, E: E, parts: parts, W0: W0, tilt: function () { return lastT; } };
 })();
@@ -3330,6 +3340,7 @@ if (/[?&]test=1/.test(location.search)) window.__bp = { fillLimits: fillLimits, 
 (function () {
   "use strict";
   var B = window.BPB, S = B.S, GM = BPGuide, E = BPEngine, $ = B.$, esc = B.esc, root = $("#guide"), NF = B.NF;
+  var RM = B.reducedMotion;
   var G = { cur: 1, n: 1, accepted: false, same: {}, skip: {}, mode: "", cmpA: 1, cmpB: 2, touched: false, keepHide: false, view: "", deskLim: false, afOpen: null };
   Object.defineProperty(G, "payLimit", { get: function () { return !!S.pl; }, set: function (x) { S.pl = !!x; }, enumerable: true });
   B.def("paywant", "money", "The most you want the payment to be", { ph: "e.g. 500" });
@@ -3391,7 +3402,15 @@ if (/[?&]test=1/.test(location.search)) window.__bp = { fillLimits: fillLimits, 
   function fld(id, label, noHint) {
     var w = B.fieldDom(id, GPRE); if (label) w.querySelector("label").textContent = label;
     var s = w.querySelector("input[type=range]"); if (s) s.remove();
-    if (noHint) { var h = w.querySelector(".hint:not(.exhint)"); if (h) h.remove(); }
+    var hint = noHint && w.querySelector(".hint:not(.exhint)");
+    if (hint) {
+      var input = w.querySelector("input[type=text]");
+      if (input) {
+        var refs = (input.getAttribute("aria-describedby") || "").split(" ").filter(function (ref) { return ref !== hint.id; });
+        input.setAttribute("aria-describedby", refs.join(" "));
+      }
+      hint.remove();
+    }
     w.classList.add("g-fld"); return w;
   }
   function keepHtml(showIt) {
@@ -3774,7 +3793,7 @@ if (/[?&]test=1/.test(location.search)) window.__bp = { fillLimits: fillLimits, 
     if (ready.length < 2) return "";
     if (ready.indexOf(G.cmpA) < 0 || ready.indexOf(G.cmpB) < 0 || G.cmpA === G.cmpB) { G.cmpA = ready[ready.length - 2]; G.cmpB = ready[ready.length - 1]; }
     var opts = function (sel) { return ready.map(function (i) { return '<option value="' + i + '"' + (i === sel ? " selected" : "") + ">Offer " + i + "</option>"; }).join(""); };
-    var h = '<h2 class="g-h2">Compare</h2><div class="g-pick"><label for="g-ca">Compare</label><select id="g-ca">' + opts(G.cmpA) + '</select><label for="g-cb">with</label><select id="g-cb">' + opts(G.cmpB) + "</select></div>";
+    var h = '<h2 class="g-h2">Compare</h2><div class="g-pick"><label for="g-ca">Compare<span class="sr"> first offer</span></label><select id="g-ca">' + opts(G.cmpA) + '</select><label for="g-cb">with<span class="sr"> second offer</span></label><select id="g-cb">' + opts(G.cmpB) + "</select></div>";
     var c = GM.compare(ofInp(G.cmpA), ofInp(G.cmpB), "Offer " + G.cmpA, "Offer " + G.cmpB);
     if (!c) return h + '<p class="g-sent">Tap or type months, rate and cash down for both offers to compare them. Tap “Same as” for what did not move.</p>';
     h += '<p class="g-trade">' + esc(c.head).replace(". ", ".<br>") + '</p><p class="g-sent">' + esc(c.sentence) + "</p>" + slabSvg(c, G.cmpA, G.cmpB);
@@ -3939,7 +3958,7 @@ if (/[?&]test=1/.test(location.search)) window.__bp = { fillLimits: fillLimits, 
         '<button type="button" id="g-ah-' + r + '-price" data-ahow="' + r + ':price" aria-pressed="' + (how === "price") + '">Price</button></div>' +
         '<div class="g-of-amthost" id="g-of-amt-' + r + '"></div>' +
         '<p class="g-of-fig" id="g-of-fig-' + r + '"></p>' +
-        '<label class="cbx g-of-tick"><input type="checkbox" data-atick="' + r + '"' + (ticked ? " checked" : "") + '><span>I\'m taking this</span></label>' +
+        '<label class="cbx g-of-tick"><input type="checkbox" aria-label="I\'m taking this: ' + esc(item.title) + '" data-atick="' + r + '"' + (ticked ? " checked" : "") + '><span>I\'m taking this</span></label>' +
         '<div class="g-of-fhost" id="' + fhId(r) + '"></div></section>';
     }).join("");
     root.innerHTML = '<div id="g-bar" class="g-bar" aria-hidden="true"></div><div class="g-grid g-dg"><div class="g-top"><p class="g-back"><a class="g-link" href="#desk">&larr; Back to the numbers</a></p>' +
@@ -4085,12 +4104,12 @@ if (/[?&]test=1/.test(location.search)) window.__bp = { fillLimits: fillLimits, 
   }
   function route() {
     var h = location.hash.replace(/^#/, "").split("&")[0];
-    if (/^n=/.test(h)) return;
+    if (h === "main" || /^n=/.test(h)) return;
     var priced = (!B.priceSubmitted || B.priceSubmitted()) && B.v("fast.price") !== null && !S.example && !S.exv["fast.price"];
     if (h === "before" || h === "desk" || h === "trade" || h === "office" || h === "after") { show(h); return; }
     root.hidden = true; root.removeAttribute("data-view"); root.classList.remove("has-qcmp"); G.view = ""; document.title = "Balance Point Auto";
     var map = { "before/month": 1, "before/paths": 6, "before/room": 8, "lot": priced ? 6 : 5, "lot/detail": 9, "": 0 };
-    var st = map[h] === undefined ? 0 : map[h];
+    var st = Object.prototype.hasOwnProperty.call(map, h) ? map[h] : 0;
     if (st === 6 && !priced) st = 5;
     B.go(st, true); doorRow();
     window.scrollTo(0, 0); var hh = st ? document.getElementById("t" + st) : null; if (hh) hh.focus({ preventScroll: true });
@@ -4100,6 +4119,13 @@ if (/[?&]test=1/.test(location.search)) window.__bp = { fillLimits: fillLimits, 
     if (G.view === "before") drawBefore(); else if (G.view === "desk") drawDesk(); else if (G.view === "trade") drawTrade(); else if (G.view === "office") drawOffice(); else if (G.view === "after") drawAfter();
     doorRow();
   };
+  var skipLink = document.querySelector(".skip");
+  if (skipLink) skipLink.addEventListener("click", function (e) {
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    var main = $("#main");
+    if (main) main.focus();
+  });
   addEventListener("hashchange", route);
 
   function sameTagText(k, f, isSame, isSkip, hasVal) {
@@ -4155,7 +4181,11 @@ if (/[?&]test=1/.test(location.search)) window.__bp = { fillLimits: fillLimits, 
       }
       else if (a === "changed") { var gk2 = $("#g-know"); if (gk2) gk2.open = true; var ai = document.getElementById(fldId(oid(k, "apr"))); if (ai) ai.focus(); }
       else if (a === "own") { e.preventDefault(); var d = $("#g-detail"); if (d) { d.open = true; var i = d.querySelector("input[type=text]"); if (i) i.focus(); } else { location.hash = "#desk"; } }
-      else if (a === "tocmp") { var ce = $("#g-cmp"); if (ce && ce.scrollIntoView) ce.scrollIntoView({ behavior: "smooth", block: "start" }); }
+      else if (a === "tocmp") {
+        var comparison = $("#g-cmp"), first = $("#g-ca");
+        if (comparison && comparison.scrollIntoView) comparison.scrollIntoView({ behavior: RM.matches ? "auto" : "smooth", block: "start" });
+        if (first) first.focus({ preventScroll: true });
+      }
       else if (a === "addoffer") { G.n = Math.min(MAXO, G.n + 1); G.cur = G.n; buildDesk(); var f = $("#g-form .g-pay input[type=text]") || $("#g-form input[type=text]"); if (f) f.focus(); }
       else if (a === "clear") {
         ["pay", "n", "apr", "down", "af", "tv", "owed"].forEach(function (f) { delete S.v[oid(k, f)]; delete G.same[oid(k, f)]; delete G.skip[oid(k, f)]; });
@@ -4197,14 +4227,14 @@ if (/[?&]test=1/.test(location.search)) window.__bp = { fillLimits: fillLimits, 
     }
     else if (t.hasAttribute("data-ask-q")) {
       var qt = $("#g-ask-q-" + t.getAttribute("data-ask-q"));
-      if (qt) { if (qt.scrollIntoView) qt.scrollIntoView({ behavior: "smooth", block: "center" }); qt.focus({ preventScroll: true }); }
+      if (qt) { if (qt.scrollIntoView) qt.scrollIntoView({ behavior: RM.matches ? "auto" : "smooth", block: "center" }); qt.focus({ preventScroll: true }); }
     }
     else if (t.hasAttribute("data-move")) {
       var mk = t.getAttribute("data-move");
       if (mk === "run") { var gd = $("#g-detail"); if (gd) gd.open = true; }
       else if (mk === "rate" || mk === "down") { var gk = $("#g-know"); if (gk) gk.open = true; }
       var mi = document.getElementById(moveTargetId(mk, k));
-      if (mi) { if (mi.scrollIntoView) mi.scrollIntoView({ behavior: "smooth", block: "center" }); mi.focus(); }
+      if (mi) { if (mi.scrollIntoView) mi.scrollIntoView({ behavior: RM.matches ? "auto" : "smooth", block: "center" }); mi.focus(); }
     }
   }
   root.addEventListener("pointerdown", function (e) {
@@ -4219,8 +4249,15 @@ if (/[?&]test=1/.test(location.search)) window.__bp = { fillLimits: fillLimits, 
     runAction(t, e);
   });
   root.addEventListener("change", function (e) {
-    if (e.target.id === "g-ca") { G.cmpA = +e.target.value; drawDesk(); }
-    else if (e.target.id === "g-cb") { G.cmpB = +e.target.value; drawDesk(); }
+    var id = e.target.id;
+    if (id === "g-ca" || id === "g-cb") {
+      var focused = document.activeElement === e.target;
+      if (id === "g-ca") G.cmpA = +e.target.value;
+      else G.cmpB = +e.target.value;
+      drawDesk();
+      var select = document.getElementById(id);
+      if (focused && select) select.focus({ preventScroll: true });
+    }
     else if (e.target.hasAttribute && e.target.hasAttribute("data-atick")) {
       var r = e.target.getAttribute("data-atick");
       S.v["a" + r + ".tick"] = e.target.checked ? "1" : "";
@@ -4244,17 +4281,27 @@ if (/[?&]test=1/.test(location.search)) window.__bp = { fillLimits: fillLimits, 
   (function () {
     var q = location.search, g = /[?&]guide=([a-z]+)/.exec(q); if (!g) return;
     ensureFields();
-    function offer(k) { var m = new RegExp("[?&]offer" + k + "=([^&]*)").exec(q); if (!m) return; var p = decodeURIComponent(m[1]).split(","); G.n = Math.max(G.n, k);
+    function parts(encoded) {
+      try { return decodeURIComponent(encoded).split(","); }
+      catch (e) { return []; }
+    }
+    function offer(k) { var m = new RegExp("[?&]offer" + k + "=([^&]*)").exec(q); if (!m) return; var p = parts(m[1]); if (!p.length) return; G.n = Math.max(G.n, k);
       ["pay", "n", "apr", "down", "af"].forEach(function (f, i) { var x = (p[i] || "").trim(); if (x === "same" && k > 1) { applySame(k, f); } else if (x === "skip") G.skip[oid(k, f)] = true; else if (x) S.v[oid(k, f)] = f === "apr" ? GM.cleanDecimals(x, 3) : (f === "pay" || f === "down" || f === "af") ? GM.cleanDecimals(x, 2) : x; }); }
-    for (var k = 1; k <= 6; k++) offer(k);
-    var cur = /[?&]cur=(\d)/.exec(q); G.cur = cur ? +cur[1] : G.n;
-    var t = /[?&]trade=([^&]*)/.exec(q); if (t) { var tp = decodeURIComponent(t[1]).split(","), tk = G.cur; S.v[oid(tk, "tv")] = GM.cleanDecimals(tp[0] || "", 2); S.v[oid(tk, "owed")] = GM.cleanDecimals(tp[1] || "", 2); }
+    for (var k = 1; k <= MAXO; k++) offer(k);
+    var cur = /[?&]cur=(\d)/.exec(q); G.cur = cur && +cur[1] >= 1 && +cur[1] <= G.n ? +cur[1] : G.n;
+    var trade = /[?&]trade=([^&]*)/.exec(q);
+    var tradeParts = trade ? parts(trade[1]) : [];
+    if (tradeParts.length) {
+      S.v[oid(G.cur, "tv")] = GM.cleanDecimals(tradeParts[0] || "", 2);
+      S.v[oid(G.cur, "owed")] = GM.cleanDecimals(tradeParts[1] || "", 2);
+    }
     var md = /[?&]mode=(in|notyet|unsure)/.exec(q); if (md) G.mode = md[1];
     var pl = /[?&]place=(or|wa|ca|other)/.exec(q); if (pl) S.v["of.place"] = pl[1];
     for (var r = 1; r <= 4; r++) {
       var am = new RegExp("[?&]addon" + r + "=([^&]*)").exec(q);
       if (am) {
-        var ap = decodeURIComponent(am[1]).split(",");
+        var ap = parts(am[1]);
+        if (!ap.length) continue;
         S.v["a" + r + ".how"] = (ap[0] || "").trim() === "price" ? "price" : "month";
         if ((ap[1] || "").trim()) S.v["a" + r + ".amt"] = GM.cleanDecimals(ap[1].trim(), 2);
         S.v["a" + r + ".tick"] = ((ap[2] || "").trim() === "1" || (ap[2] || "").trim() === "true") ? "1" : "";
@@ -4272,8 +4319,7 @@ if (/[?&]test=1/.test(location.search)) window.__bp = { fillLimits: fillLimits, 
   // ---- links to other pages open in a new tab, so the typed numbers stay on this page ------------------------------------------------------
   (function () {
     function other(h) { return !!h && h.charAt(0) !== "#" && !/^(mailto:|tel:|javascript:)/i.test(h) && !/^index\.html(#|$)/.test(h); }
-    function mark() {
-      var as = document.querySelectorAll("a[href]");
+    function mark(as) {
       for (var i = 0; i < as.length; i++) {
         var a = as[i], h = a.getAttribute("href");
         if (a.hasAttribute("data-newtab") || !other(h)) continue;
@@ -4282,10 +4328,18 @@ if (/[?&]test=1/.test(location.search)) window.__bp = { fillLimits: fillLimits, 
         var m = document.createElement("span"); m.className = "g-nt"; m.setAttribute("aria-hidden", "true"); m.innerHTML = '<svg viewBox="0 0 12 12" width="11" height="11" focusable="false"><rect x="1" y="3.5" width="7" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M4 3.5V2a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H8.5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>'; a.appendChild(m);
       }
     }
-    var pend = false;
-    function later() { if (pend) return; pend = true; Promise.resolve().then(function () { pend = false; mark(); }); }
-    mark();
-    if (typeof MutationObserver === "function") new MutationObserver(later).observe(document.body, { childList: true, subtree: true });
+    mark(document.querySelectorAll("a[href]"));
+    if (typeof MutationObserver === "function") {
+      new MutationObserver(function (records) {
+        records.forEach(function (record) {
+          record.addedNodes.forEach(function (node) {
+            if (node.nodeType !== 1 || !node.isConnected) return;
+            if (node.matches("a[href]")) mark([node]);
+            mark(node.querySelectorAll("a[href]"));
+          });
+        });
+      }).observe(document.body, { childList: true, subtree: true });
+    }
   })();
   // ---- anonymous visit counter (live hosts only; NOTES.md, section "Counter") -----------------------------------------------------------
   // Cloudflare Web Analytics (no cookie) counts page views by address. A step is counted by swapping the address to a fixed /step/<name> path
